@@ -1,3 +1,17 @@
+import re
+import os
+import subprocess
+from dotenv import load_dotenv
+import web3
+from web3 import Web3
+
+load_dotenv()
+
+# Set Provider
+w3 = Web3(
+    Web3.HTTPProvider(os.getenv("WEB3_PROVIDER_URI"))
+)
+
 class AddressAnalyzer:
     def __init__(self, address):
         self.address = address
@@ -5,7 +19,10 @@ class AddressAnalyzer:
     def is_eoa(self):
         # Check if the address is an EOA
         # Return True if it is an EOA, False if it is a smart contract
-        pass
+        if Web3.toInt(w3.eth.get_code(Web3.toChecksumAddress(self.address))) == 0:
+            return True
+        
+        return False
     
     def get_contract_type(self):
         # Use an open source decoder or decompiler to decode the smart contract
@@ -15,9 +32,10 @@ class AddressAnalyzer:
         pass
 
 
+EOA = '0xC43c0001501047b6DC2721b78c3C2268b583995d'
 
 # Create an instance of the AddressAnalyzer class
-analyzer = AddressAnalyzer("0x1234567890abcdef")
+analyzer = AddressAnalyzer(EOA)
 
 # Check if the address is an EOA
 if analyzer.is_eoa():
@@ -55,7 +73,7 @@ methods_dict = {
 
 # Initialize an empty list to store the probable contract types
 probable_types = []
-
+methods = []
 # Iterate over the list of methods in the contract
 for method in methods:
     # Check if the method name is in the dictionary
