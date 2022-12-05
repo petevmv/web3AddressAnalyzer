@@ -1,4 +1,6 @@
+import sys
 import re
+import requests
 import os
 import subprocess
 from dotenv import load_dotenv
@@ -25,17 +27,51 @@ class AddressAnalyzer:
         return False
     
     def get_contract_type(self):
-        # Use an open source decoder or decompiler to decode the smart contract
-        # Get the methods in the contract and compare them to samples of real world
-        # smart contracts to determine the probable type of the contract
-        # Return the probable type of the contract
+        # The command to run the decompiler
+        decompiler_command = f"panoramix {self.address}"
+
+        # Split the command into a list of arguments
+        decompiler_args = decompiler_command.split()
+        
+        # The first argument is the program name
+        program = decompiler_args[0]
+
+        # The second argument is the contract address
+        contract_address = decompiler_args[1]
+
+        # Run the decompiler and capture the output
+        decompiler_output = subprocess.run([program, contract_address], stdout=subprocess.PIPE).stdout.decode("utf-8")
+        
+        # Remove the ANSI escape codes
+        decompiler_output = re.sub(r"\x1b\[[0-9;]*m", "", decompiler_output)
+        
+        # Use regular expressions to search for lines that contain "def" followed by the method name
+        methods = re.findall(r"def (\w+):?", decompiler_output)
+
+        print(methods)
         pass
 
+    
+    def main_request(request):
+        # api request to baseurl = "https://www.4byte.directory/api/v1/signatures/?hex_signature="
+        r = requests.get(request, verify=False)
+        return r.json()
 
-EOA = '0xC43c0001501047b6DC2721b78c3C2268b583995d'
 
+    def parse_json(response):
+        result = [] 
+        for item in response['results']:
+        # print(item)
+            result.append(item['text_signature'])
+
+        return result
+
+
+
+# EOA = '0xC43c0001501047b6DC2721b78c3C2268b583995d'
+# Nexo = '0xB62132e35a6c13ee1EE0f84dC5d40bad8d815206'
 # Create an instance of the AddressAnalyzer class
-analyzer = AddressAnalyzer(EOA)
+analyzer = AddressAnalyzer(sys.argv[1])
 
 # Check if the address is an EOA
 if analyzer.is_eoa():
