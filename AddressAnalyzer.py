@@ -16,18 +16,50 @@ METHODS_DICT = {
     "transferFrom": "ERC20",
     "allowance": "ERC20",
     "totalSupply": "ERC20",
-    "mint": "ERC20",
-    "burn": "ERC20",
+    "mint": "ERC20, DAO, liquidity pool",
+    "burn": "ERC20, liquidity pool",
     "payable": "ERC20",
     "send": "ERC20",
     "deposit": "ERC20",
     "withdraw": "ERC20",
-    "addLiquidity": "Uniswap",
-    "removeLiquidity": "Uniswap",
+    "addLiquidity": "liquidity pool",
+    "removeLiquidity": "liquidity pool",
     "getPrice": "Uniswap",
-    "getInputPrice": "Uniswap",
-    "swapExactTokensForTokens": "Uniswap",
-    "swapTokensForExactTokens": "Uniswap",
+    "getInputPrice": "DEX, Uniswap",
+    "swapExactTokensForTokens": "DEX, Uniswap",
+    "swapTokensForExactTokens": "DEX, Uniswap",
+    "addToAllowedList":'TornadoCash',
+    "bulkResolve": 'TornadoCash',
+    "changeTransferability": "TornadoCash",
+    "getGovernance": "TornadoCash",
+    "getSignature": "TornadoCash",
+    "stake": "staking and liquidity pool",
+    "unstake": 'staking and liquidity pool',
+    "getTotalEarnedAmount": 'staking and liquidity pool',
+    "addToAprLockOption": 'staking and liquidity pool',
+    "borrow" : 'Loan, Lending',
+    "repay" : 'Loan, Lending',
+    "liquidate" : 'Loan, Lending',
+    "setLoanParams" : "Loan, Lending",
+    "setCollateralParams" : 'Loan, Lending',
+    "ownerOf" : "ERC721, ERC1155",
+    "safeTransferFrom" : "ERC721",
+    "batchTransfer" : "ERC1155",
+    "propose" : "DAO",
+    "vote" : "DAO, govtoken",
+    "delegate": "liquidity pool",
+    "delegateBySig" : 'liquidity pool',
+    "whitelistInvestor" : "ICO",
+    "registerInvestor" : "ICO",
+    "mintTokens" : "ICO",
+    "InitializableAdminUpgradeabilityProxy": "type AAVE",
+    "admin" : 'type AAVE',
+    "upgradeTo": "type AAVE",
+    "upgradeToAndCall" : 'type AAVE'
+
+
+
+
 }
 
 
@@ -95,7 +127,7 @@ class AddressAnalyzer:
                 methods[idx] = value
             else:
                 methods_dict[methods[idx]] = method
-
+        # print('1 ===', methods)
         # Flatten the method list as the RESfulAPI hex signature 
         # sometimes returns multiple methods corresponding to a single hex
         # e.g - flattens list of lists to a normal list
@@ -105,6 +137,7 @@ class AddressAnalyzer:
                 flatten_methods.append(method)
             else:
                 flatten_methods.extend(method)
+        # print('flatten', flatten_methods)
         
         # Initialize an empty list to store the probable contract types
         probable_types = []
@@ -112,11 +145,13 @@ class AddressAnalyzer:
         for method in flatten_methods:
             # Get only the name of the method without the arguments
             name = re.sub(r'\(.*\)', '', method)
+            
             # Check if the method name is in the dictionary
             if name in METHODS_DICT:
                 # If a match is found, add the corresponding contract type to the list
                 probable_types.append(METHODS_DICT[name])
-
+                print(name)
+        pprint(flatten_methods)
         return probable_types
 
     
