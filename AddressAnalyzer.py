@@ -1,3 +1,4 @@
+from pprint import pprint
 import sys
 import re
 import requests
@@ -6,6 +7,29 @@ import subprocess
 from dotenv import load_dotenv
 import web3
 from web3 import Web3
+
+# Create a dictionary that maps common method names to different types of smart contracts
+METHODS_DICT = {
+    "transfer": "ERC20",
+    "balanceOf": "ERC20",
+    "approve": "ERC20",
+    "transferFrom": "ERC20",
+    "allowance": "ERC20",
+    "totalSupply": "ERC20",
+    "mint": "ERC20",
+    "burn": "ERC20",
+    "payable": "ERC20",
+    "send": "ERC20",
+    "deposit": "ERC20",
+    "withdraw": "ERC20",
+    "addLiquidity": "Uniswap",
+    "removeLiquidity": "Uniswap",
+    "getPrice": "Uniswap",
+    "getInputPrice": "Uniswap",
+    "swapExactTokensForTokens": "Uniswap",
+    "swapTokensForExactTokens": "Uniswap",
+}
+
 
 load_dotenv()
 
@@ -48,8 +72,52 @@ class AddressAnalyzer:
         # Use regular expressions to search for lines that contain "def" followed by the method name
         methods = re.findall(r"def (\w+):?", decompiler_output)
 
-        print(methods)
-        pass
+        # Set baseurl for RESTful api request
+        baseurl = "https://www.4byte.directory/api/v1/signatures/?hex_signature="
+        
+        # Init a dict
+        methods_dict = {}
+        # Iterate over the list of current methods with indexing
+        for idx, method in enumerate(methods):
+            # Check if decompiler returned unknown methods 
+            if 'unknown' in method:
+                # Remove the string "unknown", remaining is function hex signature
+                methods[idx] = method[7:]
+                hex_signature = methods[idx]
+                
+                # API get request to retreive the actual name based on the hex signature
+                value = AddressAnalyzer.parse_json(AddressAnalyzer.main_request(baseurl + hex_signature))
+                
+                # Dict mapping the hex and name respectivly
+                methods_dict[hex_signature] = value
+
+                # Update the list
+                methods[idx] = value
+            else:
+                methods_dict[methods[idx]] = method
+
+        # Flatten the method list as the RESfulAPI hex signature 
+        # sometimes returns multiple methods corresponding to a single hex
+        # e.g - flattens list of lists to a normal list
+        flatten_methods = []
+        for method in methods:
+            if type(method) is str:
+                flatten_methods.append(method)
+            else:
+                flatten_methods.extend(method)
+        
+        # Initialize an empty list to store the probable contract types
+        probable_types = []
+        # Iterate over the list of methods in the contract        
+        for method in flatten_methods:
+            # Get only the name of the method without the arguments
+            name = re.sub(r'\(.*\)', '', method)
+            # Check if the method name is in the dictionary
+            if name in METHODS_DICT:
+                # If a match is found, add the corresponding contract type to the list
+                probable_types.append(METHODS_DICT[name])
+
+        return probable_types
 
     
     def main_request(request):
@@ -68,8 +136,6 @@ class AddressAnalyzer:
 
 
 
-# EOA = '0xC43c0001501047b6DC2721b78c3C2268b583995d'
-# Nexo = '0xB62132e35a6c13ee1EE0f84dC5d40bad8d815206'
 # Create an instance of the AddressAnalyzer class
 analyzer = AddressAnalyzer(sys.argv[1])
 
@@ -85,29 +151,9 @@ else:
 
 
 
-# Create a dictionary that maps common method names to different types of smart contracts
-methods_dict = {
-    "transfer": "ERC20",
-    "balanceOf": "ERC20",
-    "approve": "ERC20",
-    "transferFrom": "ERC20",
-    "allowance": "ERC20",
-    "totalSupply": "ERC20",
-    "mint": "ERC20",
-    "burn": "ERC20",
-    "payable": "ERC20",
-    "send": "ERC20",
-    "deposit": "ERC20",
-    "withdraw": "ERC20",
-    "addLiquidity": "Uniswap",
-    "removeLiquidity": "Uniswap",
-    "getPrice": "Uniswap",
-    "getInputPrice": "Uniswap",
-    "swapExactTokensForTokens": "Uniswap",
-    "swapTokensForExactTokens": "Uniswap",
-}
 
-# Initialize an empty list to store the probable contract types
+
+
 probable_types = []
 methods = []
 # Iterate over the list of methods in the contract
