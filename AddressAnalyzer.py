@@ -150,7 +150,7 @@ class AddressAnalyzer:
             if name in METHODS_DICT:
                 # If a match is found, add the corresponding contract type to the list
                 probable_types.append(METHODS_DICT[name])
-                print(name)
+                print('Match found: ',name)
         pprint(flatten_methods)
         return probable_types
 
@@ -182,22 +182,4 @@ else:
     contract_type = analyzer.get_contract_type()
     print("The address is a smart contract of type: ", contract_type)
 
-
-
-
-
-
-
-
-probable_types = []
-methods = []
-# Iterate over the list of methods in the contract
-for method in methods:
-    # Check if the method name is in the dictionary
-    if method in methods_dict:
-        # If a match is found, add the corresponding contract type to the list
-        probable_types.append(methods_dict[method])
-
-# Print the list of probable contract types
-print(probable_types)
 
