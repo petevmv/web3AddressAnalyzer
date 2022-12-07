@@ -10,8 +10,8 @@ Makes RESTful API get request to https://www.4byte.directory/ **with the verify 
 
 ### Installation:
 ```
-git clone https://github.com/petevmv/web3AddressAnalyzer.git`
-pip install -r requirements.txt`
+git clone https://github.com/petevmv/web3AddressAnalyzer.git
+pip install -r requirements.txt
 ```
 ### Running:
 set up w3 provider WEB3_PROVIDER_URI=xxxxx..... to your .env file, it will load it once you run the following
