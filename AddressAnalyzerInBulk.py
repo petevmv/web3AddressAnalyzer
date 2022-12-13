@@ -117,7 +117,6 @@ class AddressAnalyzerInBulk:
 
         return decompiler_output
 
-# get_methods(self.decompile(contract_address))
     def get_methods(output):
         # Use regular expressions to search for lines that contain "def" followed by the method name
         methods = re.findall(r"def (\w+):?", output)
@@ -132,23 +131,34 @@ class AddressAnalyzerInBulk:
                 # Remove the string "unknown", remaining is function hex signature
                 methods[idx] = method[7:]
                 hex_signature = methods[idx]
-                
+                                
                 # API get request to retreive the actual name based on the hex signature
-                value = AddressAnalyzer.parse_json(AddressAnalyzer.main_request(baseurl + hex_signature))
+                value = AddressAnalyzerInBulk.parse_json(AddressAnalyzerInBulk.main_request(baseurl + hex_signature))
                 
-                # Dict mapping the hex and name respectivly
-                methods_dict[hex_signature] = value
 
-                # Update the list
+                # Update the list               
                 methods[idx] = value
-        return methods
+        
+        flattend_methods = []
+        for method in methods:
+            if type(method) is str:
+                flattend_methods.append(method)
+            else:
+                flattend_methods.extend(method)
+        
+        return flattend_methods
 
 
 
     def get_contract_type(self, addresses):
+        # get only the smart contracts as list
         smart_conrtact_list = self.get_SC_and_EOAs(addresses)[0]
+
+        # iterate over the SC list to decompile and capture methods
         for contract in smart_conrtact_list:
-            print(contract)
+            decompile_output = self.decompile(contract)
+            methods = AddressAnalyzerInBulk.get_methods(decompile_output)
+            print(methods)            
         
     
     def main_request(request):
