@@ -61,50 +61,70 @@ METHODS_DICT = {
 
 load_dotenv()
 
-# Set Provider
-w3 = Web3(
-    Web3.HTTPProvider(os.getenv("WEB3_PROVIDER_URI"))
-)
+with open('to_analize.txt') as file:
+    addresses = eval(file.read())
 
-class AddressAnalyzer:
-    def __init__(self, address):
-        self.address = address
-    
-    def is_eoa(self):
+
+# list_of_addresses = ["0xC43c0001501047b6DC2721b78c3C2268b583995d",'0x55a6d9fbaebb268dc2fd94bed6c156bc82184004']
+
+class AddressAnalyzerInBulk:
+    def __init__(self, envvar):
+        # Set Provider
+        self.w3 = Web3(
+            Web3.HTTPProvider(os.getenv(envvar))
+                )       
+        
+    def is_eoa(self, address):
         # Check if the address is an EOA
         # Return True if it is an EOA, False if it is a smart contract
-        if Web3.toInt(w3.eth.get_code(Web3.toChecksumAddress(self.address))) == 0:
+        if Web3.toInt(self.w3.eth.get_code(Web3.toChecksumAddress(address))) == 0:
             return True
         
         return False
     
-    def get_contract_type(self):
+    def get_SC_and_EOAs(self, addresses):
+        # init lists for smart contracts and EOA's
+        EOAs = []
+        SC = []
+        # iterate over the passed addresess and populate the respective lists
+        for address in addresses:
+            if self.is_eoa(address):
+                EOAs.append(address)
+            else:
+                SC.append(address)
+        
+        return (SC, EOAs)
+
+
+    def decompile(self, contract_address):
         # The command to run the decompiler
-        decompiler_command = f"panoramix {self.address}"
+        decompiler_command = f"panoramix {contract_address}"
 
         # Split the command into a list of arguments
-        decompiler_args = decompiler_command.split()
-        
+        decompiler_args = decompiler_command.split()        
+
         # The first argument is the program name
         program = decompiler_args[0]
 
         # The second argument is the contract address
         contract_address = decompiler_args[1]
-
+    
         # Run the decompiler and capture the output
         decompiler_output = subprocess.run([program, contract_address], stdout=subprocess.PIPE).stdout.decode("utf-8")
-        
+
         # Remove the ANSI escape codes
         decompiler_output = re.sub(r"\x1b\[[0-9;]*m", "", decompiler_output)
-        
+
+        return decompiler_output
+
+# get_methods(self.decompile(contract_address))
+    def get_methods(output):
         # Use regular expressions to search for lines that contain "def" followed by the method name
-        methods = re.findall(r"def (\w+):?", decompiler_output)
+        methods = re.findall(r"def (\w+):?", output)
 
         # Set baseurl for RESTful api request
         baseurl = "https://www.4byte.directory/api/v1/signatures/?hex_signature="
-        
-        # Init a dict
-        methods_dict = {}
+
         # Iterate over the list of current methods with indexing
         for idx, method in enumerate(methods):
             # Check if decompiler returned unknown methods 
@@ -121,34 +141,15 @@ class AddressAnalyzer:
 
                 # Update the list
                 methods[idx] = value
-            else:
-                methods_dict[methods[idx]] = method
-        # Flatten the method list as the RESfulAPI hex signature 
-        # sometimes returns multiple methods corresponding to a single hex
-        # e.g - flattens list of lists to a normal list
-        flatten_methods = []
-        for method in methods:
-            if type(method) is str:
-                flatten_methods.append(method)
-            else:
-                flatten_methods.extend(method)
-        # print('flatten', flatten_methods)
-        
-        # Initialize an empty list to store the probable contract types
-        probable_types = []
-        # Iterate over the list of methods in the contract        
-        for method in flatten_methods:
-            # Get only the name of the method without the arguments
-            name = re.sub(r'\(.*\)', '', method)
-            
-            # Check if the method name is in the dictionary
-            if name in METHODS_DICT:
-                # If a match is found, add the corresponding contract type to the list
-                probable_types.append(METHODS_DICT[name])
-                print('Match found: ',name)
-        pprint(flatten_methods)
-        return probable_types
+        return methods
 
+
+
+    def get_contract_type(self, addresses):
+        smart_conrtact_list = self.get_SC_and_EOAs(addresses)[0]
+        for contract in smart_conrtact_list:
+            print(contract)
+        
     
     def main_request(request):
         # api request to baseurl = "https://www.4byte.directory/api/v1/signatures/?hex_signature="
@@ -167,14 +168,10 @@ class AddressAnalyzer:
 
 
 # Create an instance of the AddressAnalyzer class
-analyzer = AddressAnalyzer(sys.argv[1])
-
-# Check if the address is an EOA
-if analyzer.is_eoa():
-    print("The address is an EOA.")
-else:
-    # Get the probable type of the smart contract
-    contract_type = analyzer.get_contract_type()
-    print("The address is a smart contract of type: ", contract_type)
+analyzer = AddressAnalyzerInBulk("WEB3_PROVIDER_URI")
 
 
+
+print(analyzer.get_contract_type(addresses))
+
+# "WEB3_PROVIDER_URI" 
