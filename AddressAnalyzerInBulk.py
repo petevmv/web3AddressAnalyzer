@@ -145,6 +145,10 @@ class AddressAnalyzerInBulk:
                 flattend_methods.append(method)
             else:
                 flattend_methods.extend(method)
+
+        
+
+
         
         return flattend_methods
 
@@ -154,11 +158,17 @@ class AddressAnalyzerInBulk:
         # get only the smart contracts as list
         smart_conrtact_list = self.get_SC_and_EOAs(addresses)[0]
 
+        list_methods = []
+        
         # iterate over the SC list to decompile and capture methods
         for contract in smart_conrtact_list:
             decompile_output = self.decompile(contract)
             methods = AddressAnalyzerInBulk.get_methods(decompile_output)
-            print(methods)            
+            # append sets of method so we can use intersection
+            list_methods.append(set(methods))
+
+        result = list_methods[-1].intersection(*list_methods[0:-6])
+        return result
         
     
     def main_request(request):
