@@ -159,7 +159,7 @@ class AddressAnalyzerInBulk:
         smart_conrtact_list = self.get_SC_and_EOAs(addresses)[0]
 
         list_methods = []
-        
+
         # iterate over the SC list to decompile and capture methods
         for contract in smart_conrtact_list:
             decompile_output = self.decompile(contract)
@@ -167,7 +167,7 @@ class AddressAnalyzerInBulk:
             # append sets of method so we can use intersection
             list_methods.append(set(methods))
 
-        result = list_methods[-1].intersection(*list_methods[0:-6])
+        result = list_methods[0].intersection(*list_methods[1:])
         return result
         
     
