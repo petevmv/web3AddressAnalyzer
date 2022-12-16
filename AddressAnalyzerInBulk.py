@@ -117,6 +117,7 @@ class AddressAnalyzerInBulk:
 
         return decompiler_output
 
+# get_methods(self.decompile(contract_address))
     def get_methods(output):
         # Use regular expressions to search for lines that contain "def" followed by the method name
         methods = re.findall(r"def (\w+):?", output)
@@ -146,31 +147,40 @@ class AddressAnalyzerInBulk:
             else:
                 flattend_methods.extend(method)
 
-        
-
 
         
         return flattend_methods
-
-
-
+    
     def get_contract_type(self, addresses):
+        pass
+    
+
+    def methods_intersection(self, addresses):
         # get only the smart contracts as list
         smart_conrtact_list = self.get_SC_and_EOAs(addresses)[0]
 
         list_methods = []
-
         # iterate over the SC list to decompile and capture methods
         for contract in smart_conrtact_list:
             decompile_output = self.decompile(contract)
             methods = AddressAnalyzerInBulk.get_methods(decompile_output)
-            # append sets of method so we can use intersection
+            # append as sets data structure with the idea to use set.intersection
             list_methods.append(set(methods))
 
-        result = list_methods[0].intersection(*list_methods[1:])
+        result = set.intersection(*list_methods)
         return result
-        
     
+    def create_or_update_data(set_of_methods):
+        dict_type = {}
+        lend_keywords = ['borrow', 'repay','liquidate']
+        for method in set_of_methods:
+            for key in lend_keywords:
+                if key in method.lower()
+                    pass
+                    # dict_type['Lending'] = 
+
+   
+  
     def main_request(request):
         # api request to baseurl = "https://www.4byte.directory/api/v1/signatures/?hex_signature="
         r = requests.get(request, verify=False)
@@ -192,6 +202,7 @@ analyzer = AddressAnalyzerInBulk("WEB3_PROVIDER_URI")
 
 
 
-print(analyzer.get_contract_type(addresses))
+print(analyzer.methods_intersection(addresses))
+
 
 # "WEB3_PROVIDER_URI" 
