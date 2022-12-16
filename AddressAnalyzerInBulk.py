@@ -1,5 +1,4 @@
 from pprint import pprint
-import sys
 import re
 import requests
 import os
