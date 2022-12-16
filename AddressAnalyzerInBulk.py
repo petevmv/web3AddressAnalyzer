@@ -7,55 +7,6 @@ from dotenv import load_dotenv
 import web3
 from web3 import Web3
 
-# Create a dictionary that maps common method names to different types of smart contracts
-METHODS_DICT = {
-    "transfer": "ERC20",
-    "balanceOf": "ERC20",
-    "approve": "ERC20",
-    "transferFrom": "ERC20",
-    "allowance": "ERC20",
-    "totalSupply": "ERC20",
-    "mint": "ERC20, DAO, liquidity pool",
-    "burn": "ERC20, liquidity pool",
-    "payable": "ERC20",
-    "send": "ERC20",
-    "deposit": "ERC20",
-    "withdraw": "ERC20",
-    "addLiquidity": "liquidity pool",
-    "removeLiquidity": "liquidity pool",
-    "getPrice": "Uniswap",
-    "getInputPrice": "DEX, Uniswap",
-    "swapExactTokensForTokens": "DEX, Uniswap",
-    "swapTokensForExactTokens": "DEX, Uniswap",
-    "addToAllowedList":'TornadoCash',
-    "bulkResolve": 'TornadoCash',
-    "changeTransferability": "TornadoCash",
-    "getGovernance": "TornadoCash",
-    "getSignature": "TornadoCash",
-    "stake": "staking and liquidity pool",
-    "unstake": 'staking and liquidity pool',
-    "getTotalEarnedAmount": 'staking and liquidity pool',
-    "addToAprLockOption": 'staking and liquidity pool',
-    "borrow" : 'Loan, Lending',
-    "repay" : 'Loan, Lending',
-    "liquidate" : 'Loan, Lending',
-    "setLoanParams" : "Loan, Lending",
-    "setCollateralParams" : 'Loan, Lending',
-    "ownerOf" : "ERC721, ERC1155",
-    "safeTransferFrom" : "ERC721",
-    "batchTransfer" : "ERC1155",
-    "propose" : "DAO",
-    "vote" : "DAO, govtoken",
-    "delegate": "liquidity pool",
-    "delegateBySig" : 'liquidity pool',
-    "whitelistInvestor" : "ICO",
-    "registerInvestor" : "ICO",
-    "mintTokens" : "ICO",
-    "InitializableAdminUpgradeabilityProxy": "type AAVE",
-    "admin" : 'type AAVE',
-    "upgradeTo": "type AAVE",
-    "upgradeToAndCall" : 'type AAVE'
-}
 
 
 load_dotenv()
