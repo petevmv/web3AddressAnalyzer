@@ -100,8 +100,14 @@ class AddressAnalyzerInBulk:
         return flattend_methods
     
     def get_contract_type(self, addresses):
-        pass
-    
+        smart_conrtact_list = self.get_SC_and_EOAs(addresses)[0]
+
+        for contract in smart_conrtact_list:
+            decompiler_output = self.decompile(contract)
+            methods = AddressAnalyzerInBulk.get_methods(decompiler_output)
+            print(AddressAnalyzerInBulk.create_or_update_data(methods))
+
+        
 
     def methods_intersection(self, addresses):
         # get only the smart contracts as list
@@ -123,17 +129,19 @@ class AddressAnalyzerInBulk:
         dict_type = {"Lending": 
                             ['borrow', 'repay','liquidate'],
                      "ERC20": 
-                            ['transfer', 'approve', 'allowance']
+                            ['transfer', 'approve', 'allowance'],
                      "Liqudity pool":
-                            ['addliquidity', "removeLiquidity", "swap"]
+                            ['addliquidity', "removeLiquidity", "swap"],
+                    "Tornado cash" :
+                            ['hashleftright', "nullifierhashes"]
                             }
+        result = []
         for method in set_of_methods:
             for k,v in dict_type.items():
-                if key in method.lower()
-                    pass
-                    # dict_type['Lending'] = 
+                if method.lower() in v:
+                    result.append(k)
 
-   
+        return result
   
     def main_request(request):
         # api request to baseurl = "https://www.4byte.directory/api/v1/signatures/?hex_signature="
@@ -156,7 +164,7 @@ analyzer = AddressAnalyzerInBulk("WEB3_PROVIDER_URI")
 
 
 
-print(analyzer.methods_intersection(addresses))
+print(analyzer.get_contract_type(addresses))
 
 
-# "WEB3_PROVIDER_URI" 
+# "WEB3_PROVIDER_URI"  
