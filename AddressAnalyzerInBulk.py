@@ -1,3 +1,4 @@
+import pandas as pd
 from pprint import pprint
 import re
 import requests
@@ -15,8 +16,6 @@ with open('to_analize.txt') as file:
     addresses = eval(file.read())
 
 
-# list_of_addresses = ["0xC43c0001501047b6DC2721b78c3C2268b583995d",'0x55a6d9fbaebb268dc2fd94bed6c156bc82184004']
-
 class AddressAnalyzerInBulk:
     def __init__(self, envvar):
         # Set Provider
@@ -33,10 +32,10 @@ class AddressAnalyzerInBulk:
         return False
     
     def get_SC_and_EOAs(self, addresses):
-        # init lists for smart contracts and EOA's
+        # Init lists for smart contracts and EOA's
         EOAs = []
         SC = []
-        # iterate over the passed addresess and populate the respective lists
+        # Iterate over the passed addresess and populate the respective lists
         for address in addresses:
             if self.is_eoa(address):
                 EOAs.append(address)
@@ -67,7 +66,7 @@ class AddressAnalyzerInBulk:
 
         return decompiler_output
 
-# get_methods(self.decompile(contract_address))
+
     def get_methods(output):
         # Use regular expressions to search for lines that contain "def" followed by the method name
         methods = re.findall(r"def (\w+):?", output)
@@ -90,14 +89,13 @@ class AddressAnalyzerInBulk:
                 # Update the list               
                 methods[idx] = value
         
+        # flatten the methods list from [[],[]...] to [] as the API returns list structure 
         flattend_methods = []
         for method in methods:
             if type(method) is str:
                 flattend_methods.append(method)
             else:
                 flattend_methods.extend(method)
-
-
         
         return flattend_methods
     
@@ -119,12 +117,18 @@ class AddressAnalyzerInBulk:
 
         result = set.intersection(*list_methods)
         return result
-    
+
+
     def create_or_update_data(set_of_methods):
-        dict_type = {}
-        lend_keywords = ['borrow', 'repay','liquidate']
+        dict_type = {"Lending": 
+                            ['borrow', 'repay','liquidate'],
+                     "ERC20": 
+                            ['transfer', 'approve', 'allowance']
+                     "Liqudity pool":
+                            ['addliquidity', "removeLiquidity", "swap"]
+                            }
         for method in set_of_methods:
-            for key in lend_keywords:
+            for k,v in dict_type.items():
                 if key in method.lower()
                     pass
                     # dict_type['Lending'] = 
