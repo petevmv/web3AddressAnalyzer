@@ -1,4 +1,5 @@
 import pandas as pd
+import csv
 from pprint import pprint
 import re
 import requests
@@ -101,13 +102,16 @@ class AddressAnalyzerInBulk:
     
     def get_contract_type(self, addresses):
         smart_conrtact_list = self.get_SC_and_EOAs(addresses)[0]
-
-        for contract in smart_conrtact_list:
-            decompiler_output = self.decompile(contract)
-            methods = AddressAnalyzerInBulk.get_methods(decompiler_output)
-            print(AddressAnalyzerInBulk.create_or_update_data(methods))
-
         
+        with open('analized.csv', 'a') as file:
+            for contract in smart_conrtact_list:
+                decompiler_output = self.decompile(contract)
+                methods = AddressAnalyzerInBulk.get_methods(decompiler_output)
+                writer = csv.writer(file)  
+
+                writer.writerow((contract, AddressAnalyzerInBulk.create_or_update_data(methods)))
+
+
 
     def methods_intersection(self, addresses):
         # get only the smart contracts as list
@@ -129,17 +133,19 @@ class AddressAnalyzerInBulk:
         dict_type = {"Lending": 
                             ['borrow', 'repay','liquidate'],
                      "ERC20": 
-                            ['transfer', 'approve', 'allowance'],
+                            [ 'approve', 'allowance'],
                      "Liqudity pool":
-                            ['addliquidity', "removeLiquidity", "swap"],
+                            ['addliquidity', "removeliquidity", "swap", "setmarketborrowrate",'getmarketborrowrate'],
                     "Tornado cash" :
-                            ['hashleftright', "nullifierhashes"]
+                            ['hashleftright', "nullifierhashes"],
+                    "Liqudation pool colateral manager" : ['liquidationcall']
                             }
         result = []
         for method in set_of_methods:
             for k,v in dict_type.items():
-                if method.lower() in v:
-                    result.append(k)
+                for value in v:
+                    if value in method.lower():
+                        result.append(k)
 
         return result
   
