@@ -170,7 +170,10 @@ analyzer = AddressAnalyzerInBulk("WEB3_PROVIDER_URI")
 
 
 
-print(analyzer.get_contract_type(addresses))
+analyzer.get_contract_type(addresses)
+
+df = pd.read_csv('analized.csv', names=['contract', 'method'])
+print(df)
 
 
 # "WEB3_PROVIDER_URI"  
