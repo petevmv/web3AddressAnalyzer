@@ -129,19 +129,19 @@ class AddressAnalyzerInBulk:
         return result
 
 
-    def create_or_update_data(set_of_methods):
+    def create_or_update_data(methods):
         dict_type = {"Lending": 
                             ['borrow', 'repay','liquidate'],
                      "ERC20": 
                             [ 'approve', 'allowance'],
                      "Liqudity pool":
-                            ['addliquidity', "removeliquidity", "swap", "setmarketborrowrate",'getmarketborrowrate'],
+                            ['liquidationcall','addliquidity', "removeliquidity", "swap", "setmarketborrowrate",'getmarketborrowrate'],
                     "Tornado cash" :
-                            ['hashleftright', "nullifierhashes"],
-                    "Liqudation pool colateral manager" : ['liquidationcall']
+                            ['hashleftright', "nullifierhashes"]
+                    
                             }
         result = []
-        for method in set_of_methods:
+        for method in methods:
             for k,v in dict_type.items():
                 for value in v:
                     if value in method.lower():
@@ -169,10 +169,10 @@ class AddressAnalyzerInBulk:
 analyzer = AddressAnalyzerInBulk("WEB3_PROVIDER_URI")
 
 
-
+# Calling the get_contract_type method on the given addresses will create csv file with the respective data
 analyzer.get_contract_type(addresses)
 
-df = pd.read_csv('analized.csv', names=['contract', 'method'])
+df = pd.read_csv('analized.csv', names=['contract', 'probable type'])
 print(df)
 
 
