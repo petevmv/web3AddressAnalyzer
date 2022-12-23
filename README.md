@@ -13,12 +13,28 @@ Makes RESTful API get request to https://www.4byte.directory/ **with the verify 
 git clone https://github.com/petevmv/web3AddressAnalyzer.git
 pip install -r requirements.txt
 ```
+
+
 ### Running:
-set up w3 provider WEB3_PROVIDER_URI=xxxxx..... to your .env file, it will load it once you run the following
+set up w3 provider WEB3_PROVIDER_URI=xxxxx..... to your .env file, it will load it once you run either of the following 
 ```
 python AddressAnalyzer.py 0x77777FeDdddFfC19Ff86DB637967013e6C6A116C
 ```
-or address of your choise!(for this specific example is Tornado Cash)
+for one address at a time or address of your choise!(for this specific example is Tornado Cash)
+
+<b>or<b>
+
+
+for multyple addresses paste the contracts you want as a list into the file to_analize.txt and run:
+
+```
+python AddressAnalyzerInBulk.py
+
+```
+Final result is a .csv file that is passed to the pandas DataFrame and displayed. Every run the csv file is modifed and updated with the old and new data or if there is no such file - it will be created while running. 
+
+
+ 
 
 
 
