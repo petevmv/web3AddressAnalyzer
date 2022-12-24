@@ -1,3 +1,4 @@
+import json
 import pandas as pd
 import csv
 from pprint import pprint
@@ -130,16 +131,11 @@ class AddressAnalyzerInBulk:
 
 
     def create_or_update_data(methods):
-        dict_type = {"Lending": 
-                            ['borrow', 'repay','liquidate'],
-                     "ERC20": 
-                            [ 'approve', 'allowance'],
-                     "Liqudity pool":
-                            ['liquidationcall','addliquidity', "removeliquidity", "swap", "setmarketborrowrate",'getmarketborrowrate'],
-                    "Tornado cash" :
-                            ['hashleftright', "nullifierhashes"]
-                    
-                            }
+        with open('types.json', 'r') as file:
+            data = file.read()
+
+        dict_type = json.loads(data)
+
         result = []
         for method in methods:
             for k,v in dict_type.items():

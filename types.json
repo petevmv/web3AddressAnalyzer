@@ -1,0 +1,25 @@
+{
+       "Lending": [
+              "borrow", 
+              "repay",
+              "liquidate"
+       ],
+       
+       "ERC20":[
+              "approve",
+              "allowance"
+       ],
+       "Liqudity pool":[
+              "liquidationcall",
+              "addliquidity", 
+              "removeliquidity", 
+              "swap", 
+              "setmarketborrowrate",
+              "getmarketborrowrate"
+       ],
+      "Tornado cash" :[
+            "hashleftright", 
+            "nullifierhashes"
+     ]
+                    
+                            }
