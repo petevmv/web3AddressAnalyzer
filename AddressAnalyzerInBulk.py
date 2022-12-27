@@ -14,6 +14,7 @@ from web3 import Web3
 
 load_dotenv()
 
+# Opens the file that contains addresses to be analized and store them var addresses
 with open('to_analize.txt') as file:
     addresses = eval(file.read())
 
@@ -102,14 +103,17 @@ class AddressAnalyzerInBulk:
         return flattend_methods
     
     def get_contract_type(self, addresses):
+        # get only the smart contracts as list
         smart_conrtact_list = self.get_SC_and_EOAs(addresses)[0]
         
-        with open('analized.csv', 'a') as file:
+        list_methods = []
+        # opnes the file .csv and write to it(if 'a' is passed insted of 'w' appends )
+        with open('analized.csv', 'w') as file:
             for contract in smart_conrtact_list:
                 decompiler_output = self.decompile(contract)
                 methods = AddressAnalyzerInBulk.get_methods(decompiler_output)
-                writer = csv.writer(file)  
-
+                writer = csv.writer(file)
+                
                 writer.writerow((contract, AddressAnalyzerInBulk.create_or_update_data(methods)))
 
 
@@ -169,7 +173,17 @@ analyzer = AddressAnalyzerInBulk("WEB3_PROVIDER_URI")
 analyzer.get_contract_type(addresses)
 
 df = pd.read_csv('analized.csv', names=['contract', 'probable type'])
+# for type in df['probable type']:
+#     print(type)
 print(df)
 
+
+
+# could create a list of 10 addresses 
+# for each type of contracts using method_intersection - 
+# the remaining methods woudl be used for refference - example:
+# if new address is designated lets say Lending - 
+# its methods could be compared to those 10 addresses set intersection 
+# and if new one is found that is common in at least 7-8 of them --> update the json
 
 # "WEB3_PROVIDER_URI"  
