@@ -29,10 +29,8 @@ for multyple addresses paste the contracts you want as a list into the file to_a
 
 ```
 python AddressAnalyzerInBulk.py
-
 ```
-Final result is a .csv file that is passed to the pandas DataFrame and displayed. Every run the csv file is modifed and updated with the old and new data or if there is no such file - it will be created while running. 
-
+Final result is a .csv file that is passed to the pandas DataFrame and displayed.
 
  
 
