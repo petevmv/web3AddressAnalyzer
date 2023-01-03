@@ -105,9 +105,11 @@ class AddressAnalyzerInBulk:
     def get_contract_type(self, addresses):
         # get only the smart contracts as list
         smart_conrtact_list = self.get_SC_and_EOAs(addresses)[0]
-        
+    
+        excluded_methods = {'_fallback', 'storage', 'name'}        
+
         list_methods = []
-        # opnes the file .csv and write to it(if 'a' is passed insted of 'w' appends )
+        # opnes the file .csv and write to it(if 'a' is passed - it appends, if 'w' -  writes )
         with open('analized.csv', 'w') as file:
             for contract in smart_conrtact_list:
                 decompiler_output = self.decompile(contract)
@@ -116,24 +118,28 @@ class AddressAnalyzerInBulk:
                 
                 writer.writerow((contract, AddressAnalyzerInBulk.create_or_update_data(methods)))
 
+                # append as sets data structure with the idea to use set.intersection
+                list_methods.append(set(methods))
+        methods_intersection = set.intersection(*list_methods).difference(excluded_methods)
+        return methods_intersection
 
 
-    def methods_intersection(self, addresses):
-        # get only the smart contracts as list
-        smart_conrtact_list = self.get_SC_and_EOAs(addresses)[0]
+    # def methods_intersection(self, addresses):
+    #     # get only the smart contracts as list
+    #     smart_conrtact_list = self.get_SC_and_EOAs(addresses)[0]
 
-        excluded_methods = {'_fallback', 'storage'}
+    #     excluded_methods = {'_fallback', 'storage', 'name'}
         
-        list_methods = []
-        # iterate over the SC list to decompile and capture methods
-        for contract in smart_conrtact_list:
-            decompile_output = self.decompile(contract)
-            methods = AddressAnalyzerInBulk.get_methods(decompile_output)
-            # append as sets data structure with the idea to use set.intersection
-            list_methods.append(set(methods))
+    #     list_methods = []
+    #     # iterate over the SC list to decompile and capture methods
+    #     for contract in smart_conrtact_list:
+    #         decompile_output = self.decompile(contract)
+    #         methods = AddressAnalyzerInBulk.get_methods(decompile_output)
+    #         # append as sets data structure with the idea to use set.intersection
+    #         list_methods.append(set(methods))
 
-        result = set.intersection(*list_methods).difference(excluded_methods)
-        return result
+    #     result = set.intersection(*list_methods).difference(excluded_methods)
+    #     return result
 
 
     def create_or_update_data(methods):
@@ -149,7 +155,9 @@ class AddressAnalyzerInBulk:
                     if value in method.lower():
                         result.append(k)
 
-        return result
+        series_mode = pd.Series(result).mode()
+
+        return series_mode.tolist()
   
     def main_request(request):
         # api request to baseurl = "https://www.4byte.directory/api/v1/signatures/?hex_signature="
@@ -172,13 +180,11 @@ analyzer = AddressAnalyzerInBulk("WEB3_PROVIDER_URI")
 
 
 # Calling the get_contract_type method on the given addresses will create csv file with the respective data
-# analyzer.get_contract_type(addresses)
+print(analyzer.get_contract_type(addresses))
 
-# df = pd.read_csv('analized.csv', names=['contract', 'probable type'])
-# print(df)
-print(analyzer.methods_intersection(addresses))
+# Create DataFrame object from the generated csv file
+df = pd.read_csv('analized.csv', names=['contract', 'probable type'])
+print(df)
 
-
-# to update the .json file run method_intersection method from AddressanalyzerInBulk using smart contracts of the same type pastetd into to_analize.txt file 
 
 # "WEB3_PROVIDER_URI"  
