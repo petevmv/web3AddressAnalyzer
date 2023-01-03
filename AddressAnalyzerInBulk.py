@@ -122,6 +122,8 @@ class AddressAnalyzerInBulk:
         # get only the smart contracts as list
         smart_conrtact_list = self.get_SC_and_EOAs(addresses)[0]
 
+        excluded_methods = {'_fallback', 'storage'}
+        
         list_methods = []
         # iterate over the SC list to decompile and capture methods
         for contract in smart_conrtact_list:
@@ -130,7 +132,7 @@ class AddressAnalyzerInBulk:
             # append as sets data structure with the idea to use set.intersection
             list_methods.append(set(methods))
 
-        result = set.intersection(*list_methods)
+        result = set.intersection(*list_methods).difference(excluded_methods)
         return result
 
 
@@ -170,20 +172,13 @@ analyzer = AddressAnalyzerInBulk("WEB3_PROVIDER_URI")
 
 
 # Calling the get_contract_type method on the given addresses will create csv file with the respective data
-analyzer.get_contract_type(addresses)
+# analyzer.get_contract_type(addresses)
 
-df = pd.read_csv('analized.csv', names=['contract', 'probable type'])
-# for type in df['probable type']:
-#     print(type)
-print(df)
-
+# df = pd.read_csv('analized.csv', names=['contract', 'probable type'])
+# print(df)
+print(analyzer.methods_intersection(addresses))
 
 
-# could create a list of 10 addresses 
-# for each type of contracts using method_intersection - 
-# the remaining methods woudl be used for refference - example:
-# if new address is designated lets say Lending - 
-# its methods could be compared to those 10 addresses set intersection 
-# and if new one is found that is common in at least 7-8 of them --> update the json
+# to update the .json file run method_intersection method from AddressanalyzerInBulk using smart contracts of the same type pastetd into to_analize.txt file 
 
 # "WEB3_PROVIDER_URI"  
